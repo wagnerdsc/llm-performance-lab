@@ -1,0 +1,6 @@
+# CPU-only profile
+extends: default.yaml
+
+gpu_layers: 0
+threads: 4
+timeout: 900

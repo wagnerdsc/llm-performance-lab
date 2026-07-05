@@ -1,0 +1,25 @@
+# Default configuration for LLM Performance Lab
+models_dir: models
+datasets_dir: datasets
+results_dir: results
+reports_dir: reports
+figures_dir: figures
+cache_dir: cache
+
+context_size: 4096
+temperature: 0.0
+max_tokens: 256
+threads: -1
+gpu_layers: 999
+timeout: 600
+
+items_per_dataset: 50
+benchmark_pp_tokens: 512
+benchmark_tg_tokens: 128
+
+llama_cpp_dir: cache/llama.cpp
+llama_cli: cache/llama.cpp/build/bin/llama-cli
+llama_bench: cache/llama.cpp/build/bin/llama-bench
+
+generate_reports: true
+generate_figures: true

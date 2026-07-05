@@ -1,0 +1,5 @@
+# GPU profile (NVIDIA CUDA)
+extends: default.yaml
+
+gpu_layers: 999
+timeout: 600

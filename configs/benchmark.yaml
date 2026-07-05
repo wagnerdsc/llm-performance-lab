@@ -1,0 +1,19 @@
+# Benchmark run configuration
+extends: default.yaml
+
+benchmarks:
+  - quality
+  - inference
+  - latency
+  - throughput
+  - memory
+  - quantization
+
+limit_models: null
+limit_datasets: null
+limit_items: 50
+model_glob: null
+
+reproducibility:
+  save_metadata: true
+  save_environment: true

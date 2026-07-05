@@ -1,8 +1,11 @@
 pandas
 tqdm
 psutil
+pyyaml
+matplotlib
 torch
 transformers
 accelerate
 datasets
 huggingface_hub
+pytest

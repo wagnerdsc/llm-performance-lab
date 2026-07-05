@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "llm-performance-lab"
+version = "0.2.0"
+description = "Open-source, modular benchmarking framework for quantized LLMs with llama.cpp"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+authors = [{ name = "LLM Performance Lab Contributors" }]
+keywords = ["llm", "benchmark", "gguf", "llama.cpp", "quantization"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
+dependencies = [
+    "pandas>=2.0",
+    "tqdm>=4.66",
+    "psutil>=5.9",
+    "pyyaml>=6.0",
+    "matplotlib>=3.7",
+    "torch>=2.0",
+    "transformers>=4.40",
+    "accelerate>=0.27",
+    "datasets>=2.18",
+    "huggingface_hub>=0.21",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "pytest-cov>=4.1"]
+
+[project.scripts]
+llm-perf-lab = "run:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["src*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
