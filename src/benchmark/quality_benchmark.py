@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from dataclasses import asdict
+
 from src.core.benchmark_runner import BaseBenchmark
 from src.core.experiment import Experiment, ExperimentResult
 from src.benchmark.quality import run_quality_benchmark
@@ -14,7 +16,7 @@ class QualityBenchmark(BaseBenchmark):
 
     def run(self, experiment: Experiment) -> ExperimentResult:
         cfg = experiment.config
-        csv_path = run_quality_benchmark(
+        csv_path, stats = run_quality_benchmark(
             models_dir=cfg.models_dir,
             datasets_dir=cfg.datasets_dir,
             items_per_dataset=cfg.items_per_dataset,
@@ -26,5 +28,11 @@ class QualityBenchmark(BaseBenchmark):
             limit_datasets=cfg.limit_datasets,
             model_glob=cfg.model_glob,
             results_dir=cfg.results_dir,
+            resume=getattr(cfg, "resume", True),
         )
-        return ExperimentResult(benchmark=self.name, csv_path=csv_path)
+        return ExperimentResult(
+            benchmark=self.name,
+            csv_path=csv_path,
+            row_count=stats.records_added,
+            extra=asdict(stats),
+        )

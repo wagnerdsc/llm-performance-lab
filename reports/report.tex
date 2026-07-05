@@ -1,0 +1,23 @@
+\documentclass{article}
+\usepackage{booktabs}
+\begin{document}
+\title{LLM Performance Lab Benchmark Report}
+\date{2026-07-05}
+\maketitle
+\section{Throughput}
+\begin{tabular}{lrr}
+\toprule
+Model & pp512 t/s & tg128 t/s \\
+\midrule
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-F16.gguf & 16.06 & 1.46 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q2\_K.gguf & 25.99 & 4.14 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q3\_K\_M.gguf & 21.63 & 3.71 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q4\_K\_M.gguf & 37.46 & 3.59 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q5\_K\_M.gguf & 16.5 & 2.79 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q6\_K.gguf & 22.94 & 2.53 \\
+Qwen2.5-3B-Instruct/Qwen2.5-3B-Instruct-Q8\_0.gguf & 30.31 & 2.47 \\
+\bottomrule
+\end{tabular}
+\section{Quality}
+Overall accuracy: 26.5% (562 items).
+\end{document}

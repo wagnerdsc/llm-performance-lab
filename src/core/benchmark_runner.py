@@ -45,6 +45,9 @@ class BenchmarkRunner:
             result = benchmark.run(experiment)
             results.append(result)
             logger.info("Benchmark %s completed (%d rows)", name, result.row_count)
+            if result.extra:
+                for key, value in result.extra.items():
+                    logger.info("  %s: %s", key, value)
         return results
 
     @staticmethod

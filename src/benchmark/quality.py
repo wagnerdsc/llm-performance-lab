@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
+import logging
 from pathlib import Path
 
 from tqdm import tqdm
 
+from src.benchmark.quality_stats import QualityRunStats
 from src.config import (
     DATASET_DIR,
     DEFAULT_ITEMS_POR_DATASET,
@@ -18,16 +20,15 @@ from src.config import (
     ensure_directories,
 )
 from src.datasets import (
-    acertou,
     carregar_jsonl,
     dataset_suportado_qualidade,
     extrair_alternativa,
-    montar_prompt,
-    obter_resposta_esperada,
 )
 from src.evaluators.factory import EvaluatorFactory
 from src.llm.llama_runner import run_llama
-from src.utils.io import append_csv, processed_csv_keys, timestamp_iso
+from src.utils.io import append_csv, count_csv_rows, processed_csv_keys, timestamp_iso
+
+logger = logging.getLogger(__name__)
 
 QUALITY_COLUMNS = [
     "timestamp", "modelo", "dataset", "item_idx",
@@ -52,7 +53,8 @@ def run_quality_benchmark(
     limit_datasets: int | None = None,
     model_glob: str | None = None,
     results_dir: Path | None = None,
-) -> Path:
+    resume: bool = True,
+) -> tuple[Path, QualityRunStats]:
     """Run quality evaluation across models and datasets with incremental CSV."""
     from src.validacao import obter_datasets, obter_modelos, validar_datasets, validar_modelos
 
@@ -68,23 +70,35 @@ def run_quality_benchmark(
 
     models = obter_modelos(base_models, limit=limit_models, model_glob=model_glob)
     datasets = obter_datasets(base_datasets, limit=limit_datasets)
-    processed = processed_csv_keys(csv_path, ["modelo", "dataset", "item_idx"])
+    processed = processed_csv_keys(csv_path, ["modelo", "dataset", "item_idx"]) if resume else set()
+
+    stats = QualityRunStats(rows_before=count_csv_rows(csv_path))
+    logger.info("Quality benchmark starting: csv=%s rows_before=%d resume=%s", csv_path, stats.rows_before, resume)
 
     for model in tqdm(models, desc="Models"):
         model_name = str(model.relative_to(base_models))
         for dataset_path in datasets:
             dataset_name = str(dataset_path.relative_to(base_datasets))
-            items = carregar_jsonl(dataset_path, limite=items_per_dataset)
+            items = carregar_jsonl(dataset_path, limit=items_per_dataset)
 
             for idx, item in enumerate(items):
                 key = (model_name, dataset_name, str(idx))
-                if key in processed or not dataset_suportado_qualidade(dataset_path, item):
+
+                if key in processed:
+                    stats.items_skipped += 1
+                    logger.debug("Skipping (already processed): %s", key)
+                    continue
+
+                if not dataset_suportado_qualidade(dataset_path, item):
+                    stats.items_skipped += 1
+                    logger.debug("Skipping (unsupported dataset): %s", dataset_name)
                     continue
 
                 evaluator = EvaluatorFactory.create(dataset_path, item)
                 expected = evaluator.get_expected(item, dataset_path)
                 prompt = evaluator.build_prompt(item, dataset_path)
 
+                stats.inferences_run += 1
                 result = run_llama(
                     model, prompt,
                     max_tokens=max_tokens, ngl=ngl,
@@ -94,6 +108,8 @@ def run_quality_benchmark(
 
                 response, error, correct, alt, metric, score = "", "", False, "", "", 0.0
                 if result.success:
+                    if result.response:
+                        stats.responses_received += 1
                     eval_result = evaluator.evaluate(result.response, item, dataset_path)
                     response = result.response
                     alt = extrair_alternativa(response)
@@ -119,8 +135,24 @@ def run_quality_benchmark(
                     "metric": metric,
                     "score": score,
                 })
+                stats.records_added += 1
                 processed.add(key)
+                logger.info(
+                    "Record added: model=%s dataset=%s item=%d (total_added=%d)",
+                    model_name, dataset_name, idx, stats.records_added,
+                )
+
+    stats.rows_after = count_csv_rows(csv_path)
+    logger.info("Inferências executadas: %d", stats.inferences_run)
+    logger.info("Respostas recebidas: %d", stats.responses_received)
+    logger.info("Registros adicionados: %d", stats.records_added)
+    logger.info("Itens ignorados (retomada/filtro): %d", stats.items_skipped)
+    logger.info("Linhas CSV antes: %d | depois: %d | gravadas nesta execução: %d",
+                stats.rows_before, stats.rows_after, stats.records_added)
+    return csv_path, stats
+
+
+def avaliar_qualidade(*args, **kwargs) -> Path:
+    """Legacy wrapper returning only the CSV path."""
+    csv_path, _ = run_quality_benchmark(*args, **kwargs)
     return csv_path
-
-
-avaliar_qualidade = run_quality_benchmark

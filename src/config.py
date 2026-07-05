@@ -72,6 +72,7 @@ class LabConfig:
     generate_reports: bool = True
     generate_figures: bool = True
     save_metadata: bool = True
+    resume: bool = True
 
     @property
     def ngl(self) -> int:

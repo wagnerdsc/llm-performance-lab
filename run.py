@@ -49,6 +49,7 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--timeout", type=int, default=None)
     parser.add_argument("--no-reports", action="store_true")
     parser.add_argument("--no-figures", action="store_true")
+    parser.add_argument("--no-resume", action="store_true", help="Reprocess items even if already in CSV")
     parser.add_argument("-v", "--verbose", action="store_true")
     return parser
 
@@ -72,6 +73,8 @@ def apply_cli_overrides(cfg: LabConfig, args: argparse.Namespace) -> None:
             setattr(cfg, key, value)
     if args.limit_items is not None:
         cfg.items_per_dataset = args.limit_items
+    if args.no_resume:
+        cfg.resume = False
 
 
 def main() -> int:
