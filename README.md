@@ -89,9 +89,24 @@ timeout: 600
 items_per_dataset: 50
 ```
 
+## Architecture Diagrams
+
+Visual pipeline documentation (Mermaid — renders on GitHub):
+
+| Diagram | Description |
+|---------|-------------|
+| [architecture.mmd](docs/diagrams/architecture.mmd) | CLI → BenchmarkRunner → llama.cpp → results & reports |
+| [quality_pipeline.mmd](docs/diagrams/quality_pipeline.mmd) | Quality eval: datasets → evaluators → llama-cli → CSV |
+| [resume_logic.mmd](docs/diagrams/resume_logic.mmd) | Incremental CSV resume (skip vs infer) |
+| [data_layout.mmd](docs/diagrams/data_layout.mmd) | Models, datasets, results, reports, figures |
+| [benchmark_types.mmd](docs/diagrams/benchmark_types.mmd) | Evaluator types, datasets, and metrics |
+
+See [docs/diagrams/README.md](docs/diagrams/README.md) for viewing instructions (GitHub, VS Code/Cursor, Mermaid Live Editor).
+
 ## Documentation
 
 - [Architecture](docs/architecture.md)
+- [Architecture Diagrams](docs/diagrams/README.md)
 - [Adding Models](docs/adding_models.md)
 - [Adding Datasets](docs/adding_datasets.md)
 - [API Reference](docs/api.md)

@@ -1,0 +1,41 @@
+%% LLM Performance Lab — Resume Logic (Incremental CSV)
+%% View: GitHub, VS Code Mermaid extension, or https://mermaid.live
+
+flowchart TD
+    START([Início do quality benchmark]) --> CHECK{"CSV existe?<br/>results/quality/*.csv"}
+    CHECK -->|Não| EMPTY["processed = ∅<br/>rows_before = 0"]
+    CHECK -->|Sim| READ["Ler CSV existente<br/>(processed_csv_keys)"]
+
+    READ --> KEYS["Gerar chaves<br/>(modelo, dataset, item_idx)"]
+    KEYS --> STORE["processed = set de chaves"]
+
+    EMPTY --> LOOP
+    STORE --> LOOP{{"Próximo item<br/>(model, dataset, idx)"}}
+
+    LOOP --> KEY["key = (modelo, dataset, str(idx))"]
+    KEY --> EXISTS{"key ∈ processed?"}
+
+    EXISTS -->|Sim| SKIP["Skip inferência<br/>items_skipped += 1"]
+    EXISTS -->|Não| INF["Executar inferência<br/>llama-cli"]
+    SKIP --> LOOP
+
+    INF --> APPEND["append_csv()<br/>+ processed.add(key)"]
+    APPEND --> ADDED["records_added += 1"]
+    ADDED --> LOOP
+
+    LOOP -->|Fim| COUNT["rows_after = count_csv_rows()"]
+    COUNT --> LOG["Log: inferências · adicionados · ignorados"]
+    LOG --> END([ExperimentResult<br/>row_count = records_added])
+
+    subgraph Config["Configuração"]
+        RESUME["resume = True (padrão)"]
+        NORESUME["--no-resume → reprocessa tudo"]
+    end
+
+    RESUME -.-> CHECK
+    NORESUME -.-> EMPTY
+
+    style START fill:#4a90d9,color:#fff
+    style SKIP fill:#adb5bd,color:#000
+    style INF fill:#2d6a4f,color:#fff
+    style APPEND fill:#e9c46a,color:#000

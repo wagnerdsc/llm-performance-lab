@@ -1,0 +1,59 @@
+%% LLM Performance Lab — General Architecture
+%% View: GitHub, VS Code Mermaid extension, or https://mermaid.live
+
+flowchart TB
+    subgraph CLI["Entry Point"]
+        RUN["run.py<br/>(CLI)"]
+    end
+
+    subgraph Core["Core Layer"]
+        CFG["LabConfig<br/>(YAML)"]
+        EXP["Experiment<br/>+ metadata"]
+        BR["BenchmarkRunner"]
+        REG["BenchmarkRegistry"]
+    end
+
+    subgraph Benchmarks["Registered Benchmarks"]
+        Q["quality"]
+        T["throughput"]
+        I["inference / latency"]
+        M["memory"]
+        QU["quantization"]
+    end
+
+    subgraph Execution["Execution Layer"]
+        ML["Model Loader<br/>models/**/*.gguf"]
+        DL["Dataset Loader<br/>datasets/**/*.jsonl"]
+        LR["LLM Runner<br/>(llama_runner.py)"]
+        LC["llama.cpp<br/>llama-cli / llama-bench"]
+    end
+
+    subgraph Outputs["Outputs"]
+        RES["results/<br/>CSV + metadata.json"]
+        REP["reports/<br/>Markdown · LaTeX · CSV summary"]
+        FIG["figures/<br/>PNG plots"]
+    end
+
+    RUN --> CFG
+    RUN --> EXP
+    RUN --> BR
+    BR --> REG
+    REG --> Q & T & I & M & QU
+
+    Q --> ML & DL
+    T --> ML
+    I --> ML
+    M --> ML
+    QU --> ML
+
+    Q & I & M --> LR
+    T --> LC
+    LR --> LC
+
+    Q & T & I & M & QU --> RES
+    RES --> REP
+    RES --> FIG
+
+    style RUN fill:#4a90d9,color:#fff
+    style LC fill:#2d6a4f,color:#fff
+    style RES fill:#e9c46a,color:#000

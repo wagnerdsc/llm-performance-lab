@@ -1,0 +1,40 @@
+%% LLM Performance Lab — Quality Benchmark Pipeline
+%% View: GitHub, VS Code Mermaid extension, or https://mermaid.live
+
+flowchart TD
+    START([run.py --benchmark quality]) --> DISC_M["Detectar modelos<br/>models/**/*.gguf"]
+    START --> DISC_D["Detectar datasets<br/>datasets/**/*.jsonl"]
+
+    DISC_M --> LOOP{{"Para cada<br/>modelo × dataset × item"}}
+    DISC_D --> REG["DatasetRegistry<br/>+ dataset_loader"]
+
+    REG --> LOOP
+
+    LOOP --> RESUME{"Item já<br/>no CSV?"}
+    RESUME -->|Sim| SKIP["Skip<br/>(resume)"]
+    RESUME -->|Não| SUPP{"Dataset<br/>suportado?"}
+    SKIP --> LOOP
+
+    SUPP -->|Não| SKIP
+    SUPP -->|Sim| FACT["EvaluatorFactory.create()"]
+
+    FACT --> MC["Multiple Choice"]
+    FACT --> AR["Arithmetic"]
+    FACT --> QA["Question Answering"]
+    FACT --> GEN["Generation"]
+
+    MC & AR & QA & GEN --> PROMPT["Montar prompt<br/>+ resposta esperada"]
+    PROMPT --> CLI["llama-cli<br/>(run_llama)"]
+    CLI --> RESP["Extrair resposta<br/>+ alternativa"]
+    RESP --> EVAL["Avaliar métrica<br/>(accuracy · numeric · EM/F1)"]
+    EVAL --> APPEND["append_csv()<br/>quality_resultados.csv"]
+    APPEND --> LOOP
+
+    LOOP -->|Fim| SUM["QualityRunStats<br/>+ row_count"]
+    SUM --> REP["reports/summary/<br/>Markdown · LaTeX · CSV"]
+    SUM --> FIG["figures/<br/>accuracy plots"]
+
+    style START fill:#4a90d9,color:#fff
+    style CLI fill:#2d6a4f,color:#fff
+    style APPEND fill:#e9c46a,color:#000
+    style FACT fill:#9b5de5,color:#fff

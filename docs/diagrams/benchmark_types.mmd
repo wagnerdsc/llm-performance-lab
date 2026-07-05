@@ -1,0 +1,37 @@
+%% LLM Performance Lab — Evaluator Types & Metrics
+%% View: GitHub, VS Code Mermaid extension, or https://mermaid.live
+
+flowchart LR
+    subgraph Types["Evaluator Type"]
+        MC["Multiple Choice<br/>(MultipleChoiceEvaluator)"]
+        AR["Arithmetic<br/>(ArithmeticEvaluator)"]
+        QA["Question Answering<br/>(QuestionAnsweringEvaluator)"]
+        GEN["Generation<br/>(GenerationEvaluator)"]
+    end
+
+    subgraph Datasets["Example Datasets"]
+        MC_D["ENEM · BBQ · MMLU<br/>LogiQA · HellaSwag"]
+        AR_D["GSM8K · arithmetic<br/>numeric validation sets"]
+        QA_D["CoQA · TriviaQA<br/>SQuAD-style QA"]
+        GEN_D["WikiText · summarization<br/>open-ended generation"]
+    end
+
+    subgraph Metrics["Metrics"]
+        MC_M["Accuracy<br/>(alternativa extraída)"]
+        AR_M["Numeric match<br/>(resposta numérica)"]
+        QA_M["Exact Match · F1<br/>(token overlap)"]
+        GEN_M["BLEU · ROUGE<br/>(planned / stub)"]
+    end
+
+    MC --> MC_D --> MC_M
+    AR --> AR_D --> AR_M
+    QA --> QA_D --> QA_M
+    GEN --> GEN_D --> GEN_M
+
+    FACT["EvaluatorFactory.create()<br/>path + item heuristics"] --> MC & AR & QA & GEN
+
+    style MC fill:#4a90d9,color:#fff
+    style AR fill:#2d6a4f,color:#fff
+    style QA fill:#9b5de5,color:#fff
+    style GEN fill:#adb5bd,color:#000
+    style GEN_M fill:#f4a261,color:#000

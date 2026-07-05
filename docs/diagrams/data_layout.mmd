@@ -1,0 +1,54 @@
+%% LLM Performance Lab — Data Layout
+%% View: GitHub, VS Code Mermaid extension, or https://mermaid.live
+
+flowchart TB
+    ROOT["LLM-Performance-Lab/"]
+
+    ROOT --> MODELS
+    ROOT --> DATASETS
+    ROOT --> RESULTS
+    ROOT --> REPORTS
+    ROOT --> FIGURES
+
+    subgraph MODELS["models/ — GGUF weights"]
+        M1["Qwen2.5-3B-Instruct/<br/>├── *-F16.gguf<br/>├── *-Q4_K_M.gguf<br/>└── ..."]
+        M2["**/*.gguf<br/>(recursive discovery)"]
+    end
+
+    subgraph DATASETS["datasets/ — JSONL benchmarks"]
+        D1["bbq/*.jsonl"]
+        D2["enem/*.jsonl"]
+        D3["poetav2/gsm8k/*.jsonl"]
+        D4["**/*.jsonl<br/>(recursive discovery)"]
+    end
+
+    subgraph RESULTS["results/ — incremental outputs"]
+        R1["&lt;run_id&gt;/metadata.json<br/>(OS · CPU · GPU · config · commit)"]
+        R2["quality/quality_resultados.csv"]
+        R3["benchmark/benchmark_resultados.csv"]
+        R4["benchmark/inference_latency.csv"]
+        R5["benchmark/memory_usage.csv"]
+        R6["logs/quality_erros.log"]
+    end
+
+    subgraph REPORTS["reports/ — generated summaries"]
+        RP1["summary/*.csv"]
+        RP2["*.md"]
+        RP3["*.tex"]
+    end
+
+    subgraph FIGURES["figures/ — matplotlib plots"]
+        F1["accuracy_by_dataset.png"]
+        F2["throughput_comparison.png"]
+        F3["*.png"]
+    end
+
+    MODELS -.->|"quality · throughput"| RESULTS
+    DATASETS -.->|"quality only"| RESULTS
+    RESULTS --> REPORTS
+    RESULTS --> FIGURES
+
+    style ROOT fill:#4a90d9,color:#fff
+    style MODELS fill:#2d6a4f,color:#fff
+    style DATASETS fill:#9b5de5,color:#fff
+    style RESULTS fill:#e9c46a,color:#000
