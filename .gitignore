@@ -1,0 +1,22 @@
+# Modelos
+models/
+
+# Datasets
+datasets/
+
+# Resultados
+results/
+
+# Cache
+cache/
+
+# Python
+__pycache__/
+*.pyc
+
+# Cursor / VSCode
+.cursor/
+.vscode/
+
+# Lightning
+.lightning_studio/

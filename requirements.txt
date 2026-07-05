@@ -1,0 +1,8 @@
+pandas
+tqdm
+psutil
+torch
+transformers
+accelerate
+datasets
+huggingface_hub
